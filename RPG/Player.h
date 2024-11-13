@@ -37,6 +37,7 @@ public:
 		this->experienceMax = 100 * this->level;
 
 	}
+
 	void setHp(int hp) {
 		this->hp = hp;
 	}
@@ -114,6 +115,7 @@ public:
 
 	int healthRegeneration() {
 		return this->health = this->healthMax;
+		cout << "Genius of the year" << endl;
 	}
 	int energyRegeneration() {
 		return this->energy = this->energyMax;

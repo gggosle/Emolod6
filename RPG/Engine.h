@@ -15,6 +15,7 @@
 #include "MBlock.h"
 #include "MAttack.h"
 #include <iostream>
+#include <cstdlib>
 #include "PotionInterface.h"
 #include "APotion.h"
 #include "EPotion.h"
@@ -29,9 +30,10 @@ private:
 	Player* player = NULL;
 	FunctionHelper* fH = NULL;
 	NameHelper* nH = NULL;
-	/*SaveLoad* saveL = NULL;*/
+	//SaveLoad* saveL = NULL;
 	SkillInterface* skill = NULL;
 	MSkillInterface* mskill = NULL;
+
 	bool defenseChance() {
 		int defenseChance = ((((this->player->getShield()->getDefense() + this->player->getEndurance()) - 3) + 1) * 100) / this->player->getC();
 		if (1 + rand() % defenseChance == 1 + rand() % defenseChance) {
@@ -39,14 +41,24 @@ private:
 		}
 		return 0;
 	}
+
 	bool monsterDefenseChance() {
-		int c = 22;
-		c += this->monster->getLevel() * 4;
-		int shieldChance = (this->fH->randomRes(1, c) * 100) / c;
-		if (1 + rand() % shieldChance == 1 + rand() % shieldChance) {
-			return 1;
-		}
-	}
+        int c = 22;
+        c += this->monster->getLevel() * 4;
+        int shieldChance = (this->fH->randomRes(1, c) * 100) / c;
+
+        int rand1 = 1 + rand() % shieldChance;
+        int rand2 = 1 + rand() % shieldChance;
+
+        if (rand1 == rand2) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+
 	bool criticalChance() {
 		int percentage = 6;
 		percentage += 5 * (this->player->getLevel()-1);
@@ -83,7 +95,6 @@ private:
 			mskill = new MBlock();
 			this->monster->setHealth(mskill->use(this->monster));
 			f = this->monster->getHealth();
-
 		}
 		else {
 			mskill = new MAttack();
@@ -91,18 +102,11 @@ private:
 			f = this->player->getHealth() - gap;
 		}
 
-
-
-
 		if (f < this->player->getHealth()) {
 			(f < 0) ? player->setHealth(0) : this->player->setHealth(f);
 			cout << "-" << gap << endl << "Your health: " << this->player->getHealth() << endl;
 
 		}
-
-
-
-
 
 		return mb;
 	}
@@ -186,7 +190,7 @@ private:
 	}
 
 	void win() {
-		if (rand() % 2 == 0) {
+		if (rand() % 3 == 0) {
 			char choice = 0;
 			cout << "You've run into the guard. Run or pay 200 griven fine for killing an extinct creature.('r'?'p')" << endl;
 			cin >> choice;
@@ -220,15 +224,13 @@ private:
 			cout << "Your cash: +" << monster->getCash() << endl;
 
 		}
-		/*if (this->monster->getName() == "Yeti") {
+		if (this->monster->getName() == "Yeti") {
 			cout << "Your experience: +" << monster->getPlayerExperience() << endl;
 			cout << " 'Regulations Governing Mountain Climbing Expeditions in Nepal - Relating to Yeti.':" << endl;
 			cout << "2. Hunters can photograph or catch a Yeti but not shoot or kill it - unless in self-defense." << endl;
 			cout << "Penalty: 500 griven" << endl;
 			this->player->setCash(this->player->getCash() - 500);
-		}*/
-		
-			
+		}
 	}
 public:
 	Engine(FunctionHelper* fH, NameHelper* nH)
@@ -333,7 +335,7 @@ public:
 		return health;
 	}
 	int fight(Player* player, Monster* monster) {
-		/*this->saveL = new SaveLoad();*/
+		//this->saveL = new SaveLoad();
 		int f = 0;
 		char choice;
 		this->player = player;
@@ -341,7 +343,7 @@ public:
 		cout << endl << "Your opponnent's stats: "<<endl << this->monster->getName() << endl << "Level: " << this->monster->getLevel() << endl << "Health: " << this->monster->getHealth() << endl;
 		cout << "Experience: " << this->monster->getPlayerExperience() << endl << "Cash: " << this->monster->getCash() << endl;
 		if (this->monster->getId() == this->player->getWeapon()->getId() || this->monster->getId() == this->player->getShield()->getId()) {
-			cout << "You've got advantages over this monster " << endl;
+			cout << "You've got an advantage over this monster " << endl;
 		}
 		cout << "You wanna fight?(y/n)";
 		cin >> choice;
@@ -350,6 +352,7 @@ public:
 			this->player->stats();
 			return 0;
 		}
+
 		if (choice == 'e') {
 			char in = 0;
 			
@@ -361,11 +364,11 @@ public:
 			}
 			return 0;
 		}
-		/*else if (choice == 's') {
-			this->saveL->save(player);
-			cout << "You saved your progress" << endl;
-			return 0;
-		}*/
+//		else if (choice == 's') {
+//			this->saveL->save(player);
+//			cout << "You saved your progress" << endl;
+//			return 0;
+//		}
 		else if (choice != 'y') {
 			return 0;
 		}
@@ -414,7 +417,8 @@ public:
 				}
 			} while ((this->player->getHealth() > 0 || this->monster->getHealth() > 0));
 		}
-		this->player->healthRegeneration();
+
+		return this->player->healthRegeneration();
 
 
 

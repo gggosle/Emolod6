@@ -49,7 +49,7 @@ public:
 	int getEnergy() {
 		return this->energy;
 	}
-	void setName(int name) {
+	void setName(std::string& name) {
 		this->name = name;
 	}
 	string getName() {
